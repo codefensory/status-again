@@ -1,0 +1,52 @@
+datasource db {
+  provider = "sqlite"
+  url      = "file:dev.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Monitor {
+  id                   Int         @id @default(autoincrement())
+  name                 String
+  type                 String?
+  url                  String
+  method               String
+  headers              String?
+  body                 String?
+  interval             Int
+  maxretries           Int
+  retryInterval        Int
+  active               Boolean
+  accepted_statuscodes String
+  beats                Heartbeat[]
+  createdAt            DateTime    @default(now())
+  Incident             Incident[]
+}
+
+model Heartbeat {
+  id        Int        @id @default(autoincrement())
+  status    String
+  message   String?
+  ping      Int
+  duration  Float
+  createdAt DateTime   @default(now())
+  Monitor   Monitor?   @relation(fields: [monitorId], references: [id])
+  monitorId Int?
+  Incident  Incident[]
+}
+
+model Incident {
+  id             Int       @id @default(autoincrement())
+  active         Boolean
+  duration       Float?
+  type           String
+  title          String
+  screenshot_url String?
+  heartbeat      Heartbeat @relation(fields: [heartbeatId], references: [id])
+  monitor        Monitor   @relation(fields: [monitorId], references: [id])
+  monitorId      Int
+  heartbeatId    Int
+  createdAt      DateTime  @default(now())
+}
