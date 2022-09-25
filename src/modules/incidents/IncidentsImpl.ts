@@ -7,6 +7,9 @@ import { prisma } from "../shared/database";
 import { ToCreate } from "../shared/utils/types";
 import { v4 as uuidV4 } from "uuid";
 import dayjs from "dayjs";
+import debug from "debug";
+
+const logger = debug("api:modules:incidents:IncidentsImpl");
 
 type IncidentByMonitor = {
   [key: string]: {
@@ -16,14 +19,18 @@ type IncidentByMonitor = {
 };
 
 export class IncidentsImpl {
-  static incidentsByMonitor: IncidentByMonitor;
+  static incidentsByMonitor: IncidentByMonitor = {};
 
   static async init() {
+    logger("Incidents system started");
+
     const activeIncidents = await prisma.incident.findMany({
       where: { active: true },
     });
 
     for (let incident of activeIncidents) {
+      logger(`[${incident.title}] Use as current incident`);
+
       this.incidentsByMonitor[incident.monitorId] = {
         currentIncident: incident,
         verifingUp: false,
@@ -63,18 +70,22 @@ export class IncidentsImpl {
           },
         });
 
+        logger(
+          `[${incident.currentIncident.title}] Incident closed in ${duration} seconds`
+        );
+
         incident.verifingUp = false;
 
         incident.currentIncident = null;
       } else {
+        logger(`[${incident.currentIncident.title}] Verifing`);
         incident.verifingUp = true;
       }
     }
   }
 
   private static async createDownIncident(beat: Heartbeat) {
-    const type = IncidentTypes.PAGE_DOWN;
-    const title = "Page down";
+    logger(`[MonitorId: ${beat.monitorId}] Trying to create incident`);
 
     const monitor = await prisma.monitor.findFirst({
       where: {
@@ -84,10 +95,10 @@ export class IncidentsImpl {
 
     if (monitor) {
       const incidentToCreate: ToCreate<Incident> = {
-        type,
+        type: IncidentTypes.PAGE_DOWN,
         active: true,
         duration: null,
-        title,
+        title: monitor.name + " monitor is DOWN",
         heartbeatId: beat.id,
         screenshot_url: null,
         monitorId: monitor.id,
@@ -95,12 +106,16 @@ export class IncidentsImpl {
 
       const incident = await prisma.incident.create({ data: incidentToCreate });
 
+      logger(`[${incident.title}] Incident created`);
+
       this.incidentsByMonitor[monitor.id] = {
         currentIncident: incident,
         verifingUp: false,
       };
 
       this.takePageScreenshot(monitor.url, incident.id);
+    } else {
+      logger(`[MonitorId: ${beat.monitorId}] monitor not found`);
     }
   }
 
@@ -116,15 +131,18 @@ export class IncidentsImpl {
         const page = await browser.newPage();
         await page.goto(url);
 
-        const screenshot_url = "./" + uuidV4() + ".png";
+        const screenshot_url = "./public/screenshots/" + uuidV4() + ".png";
 
         await page.screenshot({ path: screenshot_url });
+
         await browser.close();
 
         await prisma.incident.update({
           where: { id: incidentId },
           data: { screenshot_url },
         });
+
+        logger(`[${url}] Screenshot created`);
       });
   }
 }

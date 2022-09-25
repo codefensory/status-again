@@ -2,7 +2,7 @@ import { Heartbeat, Monitor } from "@prisma/client";
 import debug from "debug";
 import { Subject } from "rxjs";
 
-const logger = debug("api:shared:events:HeartbeatEvent");
+const logger = debug("events:HeartbeatEvent");
 
 class HeartbeatEvent {
   public initializeNewBeatLoopSubject = new Subject<Monitor>();

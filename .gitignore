@@ -1,4 +1,5 @@
 node_modules
+public/screenshots/*
 dev.db
 dev.db-journal
 migrations

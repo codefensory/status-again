@@ -31,18 +31,14 @@ export class HeartbeatLoop {
 
   async loop() {
     logger(
-      `[Monitor: "${this.monitor.name}"] Trying to create a heartbeat, attempt ${this.retries}`
+      `[Monitor: "${this.monitor.name}"]`.black.bgYellow,
+      `Trying to create a heartbeat, attempt ${this.retries}`
     );
 
     const beat = this.getInitialBeat();
 
     try {
       const startTime = dayjs().valueOf();
-
-      logger(
-        `[Monitor: "${this.monitor.name}"] Getting status of endpoint ${this.monitor.url}`
-          .yellow
-      );
 
       const response = await this.runHttpRequest();
 
@@ -54,17 +50,13 @@ export class HeartbeatLoop {
 
       logger(
         `[Monitor: "${this.monitor.name}"] Status`,
-        `[${beat.message}]`.bgYellow,
-        `successfully obtained with a ping of ${beat.ping}ms`
+        `[${beat.message}]`.white.bgCyan,
+        "successfully obtained with a ping of",
+        `${beat.ping}ms`.white.bgCyan
       );
     } catch (error: any) {
       if (this.retries < this.monitor.maxretries) {
         this.retries += 1;
-
-        logger(
-          `[Monitor: "${this.monitor.name}"] Endpoint status fetching failed, retrying`
-            .red
-        );
 
         setTimeout(() => this.loop(), 2000);
 
@@ -73,13 +65,6 @@ export class HeartbeatLoop {
         beat.message = error?.message;
 
         beat.status = HeartbeatStatus.DOWN;
-
-        this.retries = 0;
-
-        logger(
-          `[Monitor: "${this.monitor.name}"] Endpoint status fetching failed`
-            .red
-        );
       }
     }
 
@@ -87,8 +72,13 @@ export class HeartbeatLoop {
 
     heartbeatEvent.hearbeatCreated(beatCreated, this.previusBeat);
 
+    this.previusBeat = beatCreated;
+
+    this.retries = 0;
+
     logger(
-      `[Monitor: "${this.monitor.name}"] Heartbeat created with`,
+      `[Monitor: "${this.monitor.name}"]`.black.bgBlue,
+      "Heartbeat created with",
       beatCreated.status === HeartbeatStatus.DOWN
         ? beatCreated.status.toUpperCase().red
         : beatCreated.status.toUpperCase().green,
