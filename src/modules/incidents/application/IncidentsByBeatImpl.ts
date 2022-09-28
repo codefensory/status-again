@@ -1,11 +1,11 @@
 import fs from "fs";
 import { Heartbeat, Incident } from "@prisma/client";
 import { filter } from "rxjs";
-import { heartbeatEvent } from "../shared/events";
-import { HeartbeatStatus, IncidentTypes } from "../shared/utils/constants";
+import { heartbeatEvent } from "../../shared/events";
+import { HeartbeatStatus, IncidentTypes } from "../../shared/utils/constants";
 import puppeter from "puppeteer";
-import { prisma } from "../shared/database";
-import { ToCreate } from "../shared/utils/types";
+import { prisma } from "../../shared/database";
+import { ToCreate } from "../../shared/utils/types";
 import { v4 as uuidV4 } from "uuid";
 import dayjs from "dayjs";
 import debug from "debug";
@@ -19,10 +19,10 @@ type IncidentByMonitor = {
   };
 };
 
-export class IncidentsImpl {
-  static incidentsByMonitor: IncidentByMonitor = {};
+export class IncidentsByBeatImpl {
+  incidentsByMonitor: IncidentByMonitor = {};
 
-  static async init() {
+  async init() {
     logger("Incidents system started");
 
     const activeIncidents = await prisma.incident.findMany({
@@ -53,7 +53,7 @@ export class IncidentsImpl {
       .subscribe((heartbeat) => this.closeIncident(heartbeat.beat));
   }
 
-  private static async closeIncident(beat: Heartbeat) {
+  private async closeIncident(beat: Heartbeat) {
     const incident = this.incidentsByMonitor[beat.monitorId ?? -1];
 
     if (incident?.currentIncident) {
@@ -85,7 +85,7 @@ export class IncidentsImpl {
     }
   }
 
-  private static async createDownIncident(beat: Heartbeat) {
+  private async createDownIncident(beat: Heartbeat) {
     const incident = this.incidentsByMonitor[beat.monitorId ?? -1];
 
     if (incident?.currentIncident) {
@@ -111,7 +111,7 @@ export class IncidentsImpl {
         active: true,
         duration: null,
         title: monitor.name + " monitor is DOWN",
-        heartbeatId: beat.id,
+        description: beat.message,
         screenshot_url: null,
         monitorId: monitor.id,
       };
@@ -131,7 +131,7 @@ export class IncidentsImpl {
     }
   }
 
-  private static async takePageScreenshot(url: string, incidentId: number) {
+  private async takePageScreenshot(url: string, incidentId: number) {
     return puppeter
       .launch({
         defaultViewport: {

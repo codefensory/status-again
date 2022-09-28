@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon ./src/index.ts"
+    "start": "nodemon -r dotenv/config ./src/index.ts"
   },
   "keywords": [],
   "author": "",
@@ -18,6 +18,9 @@
     "colors": "^1.4.0",
     "dayjs": "^1.11.5",
     "express": "^4.18.1",
+    "fastify": "^4.6.0",
+    "fastify-now": "^3.0.1",
+    "oxide.ts": "^1.0.5",
     "puppeteer": "^18.0.5",
     "rxjs": "^7.5.6",
     "uuid": "^9.0.0"
@@ -26,6 +29,7 @@
     "@types/debug": "^4.1.7",
     "@types/uuid": "^8.3.4",
     "debug": "^4.3.4",
+    "dotenv": "^16.0.2",
     "nodemon": "^2.0.19",
     "prisma": "^4.3.1",
     "ts-node": "^10.9.1",
