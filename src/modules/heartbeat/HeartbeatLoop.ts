@@ -15,9 +15,7 @@ const logger = debug("api:modules:heartbeat:HeartbeatLoop");
 
 export class HeartbeatLoop {
   static init() {
-    heartbeatEvent.initializeNewBeatLoopSubject.subscribe(
-      (monitor) => new HeartbeatLoop(monitor)
-    );
+    heartbeatEvent.initializeNewBeatLoopSubject.subscribe((monitor) => new HeartbeatLoop(monitor));
   }
 
   public previusBeat: Heartbeat | undefined;
@@ -60,8 +58,7 @@ export class HeartbeatLoop {
 
         logger(
           `[Monitor: "${this.monitor.name}"] Status`,
-          `[${error?.response?.status} ${error?.response?.statusText}]`.black
-            .bgRed,
+          `[${error?.response?.status} ${error?.response?.statusText}]`.black.bgRed,
           "fail obtained with a ping of",
           `${ping}ms`.black.bgRed
         );
@@ -129,10 +126,7 @@ export class HeartbeatLoop {
         ...(this.monitor.headers ? JSON.parse(this.monitor.headers) : {}),
       },
       validateStatus: (status) => {
-        return checkStatusCode(
-          status,
-          this.monitor.accepted_statuscodes.split(";")
-        );
+        return checkStatusCode(status, this.monitor.accepted_statuscodes.split(";"));
       },
     };
 

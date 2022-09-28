@@ -58,10 +58,7 @@ export class IncidentsByBeatImpl {
 
     if (incident?.currentIncident) {
       if (incident.verifingUp) {
-        const duration = dayjs().diff(
-          dayjs(incident.currentIncident.createdAt),
-          "second"
-        );
+        const duration = dayjs().diff(dayjs(incident.currentIncident.createdAt), "second");
 
         await prisma.incident.update({
           where: { id: incident.currentIncident.id },
@@ -71,9 +68,7 @@ export class IncidentsByBeatImpl {
           },
         });
 
-        logger(
-          `[${incident.currentIncident.title}] Incident closed in ${duration} seconds`
-        );
+        logger(`[${incident.currentIncident.title}] Incident closed in ${duration} seconds`);
 
         incident.verifingUp = false;
 

@@ -5,9 +5,7 @@ import { ToCreate } from "../../../shared/utils/types";
 import { IncidentRepository } from "../../domain";
 
 class IncidentPrismaRepository implements IncidentRepository {
-  async createIncident(
-    incident: ToCreate<Incident>
-  ): Promise<Result<Incident, Error>> {
+  async createIncident(incident: ToCreate<Incident>): Promise<Result<Incident, Error>> {
     return Result(await prisma.incident.create({ data: incident }));
   }
 }

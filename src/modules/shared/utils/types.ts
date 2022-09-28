@@ -4,7 +4,4 @@ export type Immutable<T> = {
 
 export type Values<T> = T[keyof T];
 
-export type ToCreate<T> = Omit<
-  T,
-  "id" | "createdAt" | "updatedAt" | "deletedAt"
->;
+export type ToCreate<T> = Omit<T, "id" | "createdAt" | "updatedAt" | "deletedAt">;

@@ -1,19 +1,15 @@
 import { NowRequestHandler } from "fastify-now";
-import {
-  CreateAppcrashIncidentApplication,
-  CreateAppcrashIncidentDTO,
-} from "../../../application";
+import { CreateAppcrashIncidentApplication, CreateAppcrashIncidentDTO } from "../../../application";
 import { incidentPrismaRepository } from "../../repository/incidentPrismaRepository";
 
 export const POST: NowRequestHandler<{
   Body: CreateAppcrashIncidentDTO;
 }> = async (req, _reply) => {
-  const createAppcrashIncidentApplication =
-    new CreateAppcrashIncidentApplication(incidentPrismaRepository);
-
-  const incidentResult = await createAppcrashIncidentApplication.execute(
-    req.body
+  const createAppcrashIncidentApplication = new CreateAppcrashIncidentApplication(
+    incidentPrismaRepository
   );
+
+  const incidentResult = await createAppcrashIncidentApplication.execute(req.body);
 
   if (incidentResult.isErr()) {
     return incidentResult.unwrapErr();

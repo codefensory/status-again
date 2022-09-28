@@ -31,10 +31,7 @@ async function startServer() {
   });
 
   server.register(fastifyNow, {
-    routesFolder: path.join(
-      __dirname,
-      "./modules/incidents/infrastructure/http/routes"
-    ),
+    routesFolder: path.join(__dirname, "./modules/incidents/infrastructure/http/routes"),
     pathPrefix: "/incidents",
   });
 

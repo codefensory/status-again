@@ -8,9 +8,7 @@ import { incidentEvent } from "../../../shared/events/incidentEvent";
 export class CreateAppcrashIncidentApplication {
   constructor(private repository: IncidentRepository) {}
 
-  async execute(
-    dto: CreateAppcrashIncidentDTO
-  ): Promise<Result<Incident, Error>> {
+  async execute(dto: CreateAppcrashIncidentDTO): Promise<Result<Incident, Error>> {
     const newIncident: ToCreate<Incident> = {
       type: "app_crash",
       title: dto.title,
