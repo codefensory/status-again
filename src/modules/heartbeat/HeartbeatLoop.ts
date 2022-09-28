@@ -37,9 +37,9 @@ export class HeartbeatLoop {
 
     const beat = this.getInitialBeat();
 
-    try {
-      const startTime = dayjs().valueOf();
+    const startTime = dayjs().valueOf();
 
+    try {
       const response = await this.runHttpRequest();
 
       beat.message = `${response.status} ${response.statusText}`;
@@ -50,12 +50,22 @@ export class HeartbeatLoop {
 
       logger(
         `[Monitor: "${this.monitor.name}"] Status`,
-        `[${beat.message}]`.white.bgCyan,
+        `[${beat.message}]`.black.bgGreen,
         "successfully obtained with a ping of",
-        `${beat.ping}ms`.white.bgCyan
+        `${beat.ping}ms`.black.bgGreen
       );
     } catch (error: any) {
       if (this.retries < this.monitor.maxretries) {
+        const ping = dayjs().valueOf() - startTime;
+
+        logger(
+          `[Monitor: "${this.monitor.name}"] Status`,
+          `[${error?.response?.status} ${error?.response?.statusText}]`.black
+            .bgRed,
+          "fail obtained with a ping of",
+          `${ping}ms`.black.bgRed
+        );
+
         this.retries += 1;
 
         setTimeout(() => this.loop(), 2000);
@@ -80,8 +90,8 @@ export class HeartbeatLoop {
       `[Monitor: "${this.monitor.name}"]`.black.bgBlue,
       "Heartbeat created with",
       beatCreated.status === HeartbeatStatus.DOWN
-        ? beatCreated.status.toUpperCase().red
-        : beatCreated.status.toUpperCase().green,
+        ? beatCreated.status.toUpperCase().black.bgRed
+        : beatCreated.status.toUpperCase().black.bgGreen,
       `status and id ${beatCreated.id}`
     );
 

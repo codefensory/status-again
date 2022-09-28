@@ -1,3 +1,4 @@
+import fs from "fs";
 import { Heartbeat, Incident } from "@prisma/client";
 import { filter } from "rxjs";
 import { heartbeatEvent } from "../shared/events";
@@ -85,6 +86,17 @@ export class IncidentsImpl {
   }
 
   private static async createDownIncident(beat: Heartbeat) {
+    const incident = this.incidentsByMonitor[beat.monitorId ?? -1];
+
+    if (incident?.currentIncident) {
+      if (incident.verifingUp) {
+        incident.verifingUp = false;
+
+        logger(`[Incident: ${incident.currentIncident.title}] Verify fail`);
+      }
+      return;
+    }
+
     logger(`[MonitorId: ${beat.monitorId}] Trying to create incident`);
 
     const monitor = await prisma.monitor.findFirst({
@@ -131,7 +143,13 @@ export class IncidentsImpl {
         const page = await browser.newPage();
         await page.goto(url);
 
-        const screenshot_url = "./public/screenshots/" + uuidV4() + ".png";
+        const folder = "./public/screenshots/";
+
+        const screenshot_url = folder + uuidV4() + ".png";
+
+        if (!fs.existsSync(folder)) {
+          fs.mkdirSync(folder, { recursive: true });
+        }
 
         await page.screenshot({ path: screenshot_url });
 
