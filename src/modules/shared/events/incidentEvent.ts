@@ -2,7 +2,7 @@ import { Incident } from "@prisma/client";
 import { Subject } from "rxjs";
 import debug from "debug";
 
-const logger = debug("events:HeartbeatEvent");
+const logger = debug("events:IncidentEvent");
 
 class IncidentEvent {
   public createIncidentSubject = new Subject<Incident>();
@@ -16,7 +16,7 @@ class IncidentEvent {
   }
 
   updateIncident(incident: Incident) {
-    logger("run createIncident event");
+    logger("run updateIncident event");
 
     this.updateIncidentSubject.next(incident);
   }
