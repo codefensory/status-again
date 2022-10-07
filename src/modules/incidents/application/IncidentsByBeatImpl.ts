@@ -9,6 +9,7 @@ import { ToCreate } from "../../shared/utils/types";
 import { v4 as uuidV4 } from "uuid";
 import dayjs from "dayjs";
 import debug from "debug";
+import { incidentEvent } from "../../shared/events/incidentEvent";
 
 const logger = debug("api:modules:incidents:IncidentsImpl");
 
@@ -121,6 +122,8 @@ export class IncidentsByBeatImpl {
       };
 
       this.takePageScreenshot(monitor.url, incident.id);
+
+      incidentEvent.createIncident(incident);
     } else {
       logger(`[MonitorId: ${beat.monitorId}] monitor not found`);
     }

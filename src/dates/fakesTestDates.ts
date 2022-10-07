@@ -19,27 +19,23 @@ const fakeMonitors: ToCreate<Monitor>[] = [
     active: true,
     accepted_statuscodes: "0-204,404",
   },
-  {
-    name: "shopping cart",
-    type: "http",
-    url: "https://shopping-cart-apollo-production.up.railway.app/",
-    headers: null,
-    body: null,
-    method: "GET",
-    interval: 5000,
-    retryInterval: 1000,
-    maxretries: 3,
-    active: true,
-    accepted_statuscodes: "0-204,404",
-  },
+  //{
+    //name: "shopping cart",
+    //type: "http",
+    //url: "https://shopping-cart-apollo-production.up.railway.app/",
+    //headers: null,
+    //body: null,
+    //method: "GET",
+    //interval: 5000,
+    //retryInterval: 1000,
+    //maxretries: 3,
+    //active: true,
+    //accepted_statuscodes: "0-204,404",
+  //},
 ];
 
 export const generateMonitorsData = async () => {
   logger("starting generate monitors");
-
-  logger("delete all monitors");
-
-  await prisma.monitor.deleteMany();
 
   for (let monitor of fakeMonitors) {
     logger("creating", monitor.name);
