@@ -7,12 +7,12 @@ const logger = debug("api:modules:MonitorsImpl");
 
 export class MonitorsImpl {
   static async init() {
-    logger("---- Start initMonitors ----");
+    logger("MonitorImpl system started");
 
     const monitors = await prisma.monitor.findMany();
 
     for (let monitor of monitors) {
-      logger("-> Initalize monitor:", monitor.name);
+      logger("-> Monitor initialized:", monitor.name);
 
       heartbeatEvent.initializeNewBeatLoop(monitor);
 

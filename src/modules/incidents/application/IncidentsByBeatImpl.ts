@@ -61,13 +61,15 @@ export class IncidentsByBeatImpl {
       if (incident.verifingUp) {
         const duration = dayjs().diff(dayjs(incident.currentIncident.createdAt), "second");
 
-        await prisma.incident.update({
+        const newIncidentData = await prisma.incident.update({
           where: { id: incident.currentIncident.id },
           data: {
             active: false,
             duration,
           },
         });
+
+        incidentEvent.updateIncident(newIncidentData);
 
         logger(`[${incident.currentIncident.title}] Incident closed in ${duration} seconds`);
 
@@ -106,7 +108,7 @@ export class IncidentsByBeatImpl {
         type: IncidentTypes.PAGE_DOWN,
         active: true,
         duration: null,
-        title: monitor.name + " monitor is DOWN",
+        title: "Monitor `" + monitor.name + "` is DOWN",
         description: beat.message,
         screenshot_url: null,
         monitorId: monitor.id,
@@ -153,10 +155,12 @@ export class IncidentsByBeatImpl {
 
         await browser.close();
 
-        await prisma.incident.update({
+        const incident = await prisma.incident.update({
           where: { id: incidentId },
           data: { screenshot_url },
         });
+
+        incidentEvent.updateIncident(incident);
 
         logger(`[${url}] Screenshot created`);
       });
