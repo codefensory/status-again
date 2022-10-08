@@ -6,7 +6,7 @@ import debug from "debug";
 const logger = debug("api:modules:slackIntegration:SlackIntegrationImpl");
 
 export class SlackIntegration {
-  private channelID = "C04684YANE4";
+  private channelID: string = process.env.SLACK_CHANNEL ?? "";
 
   constructor(private api: WebClient) {}
 

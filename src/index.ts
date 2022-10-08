@@ -24,11 +24,13 @@ async function main() {
 
   MonitorsImpl.init();
 
-  const api = new WebClient("xoxb-4185435863573-4185512667013-sgVqQArrdkBQzM0KEGRFILD4");
+  if (process.env.SLACK_TOKEN && process.env.SLACK_CHANNEL) {
+    const api = new WebClient(process.env.SLACK_TOKEN);
 
-  const slackIntegration = new SlackIntegration(api);
+    const slackIntegration = new SlackIntegration(api);
 
-  slackIntegration.init();
+    slackIntegration.init();
+  }
 
   startServer();
 }
