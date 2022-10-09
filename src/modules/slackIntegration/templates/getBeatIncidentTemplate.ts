@@ -37,13 +37,6 @@ export function getBeatIncidentTemplate(incident: Incident) {
     ],
   };
 
-  if (!incident.active) {
-    template.attachments[0].blocks[1].fields.push({
-      type: "mrkdwn",
-      text: "*Duration*\n" + incident.duration + " seconds",
-    });
-  }
-
   if (incident.screenshot_url) {
     template.attachments[0].blocks[1].accessory = {
       type: "image",
@@ -54,6 +47,13 @@ export function getBeatIncidentTemplate(incident: Incident) {
     template.attachments[0].blocks[1].fields.push({
       type: "mrkdwn",
       text: "*Screenshot url*\n<https://i.postimg.cc/2SJzRpj9/c126e66a-fbd4-4c55-8427-9ef645222934.png|Open screenshot>",
+    });
+  }
+
+  if (!incident.active && incident.duration) {
+    template.attachments[0].blocks[1].fields.push({
+      type: "mrkdwn",
+      text: "*Duration*\n" + incident.duration + " seconds",
     });
   }
 

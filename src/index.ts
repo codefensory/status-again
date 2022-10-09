@@ -7,6 +7,8 @@ import { HeartbeatLoop } from "./modules/heartbeat";
 import { IncidentsByBeatImpl } from "./modules/incidents/application";
 import { MonitorsImpl } from "./modules/monitors";
 import { SlackIntegration } from "./modules/slackIntegration";
+import cors from "@fastify/cors";
+
 //import { generateMonitorsData } from "./dates/fakesTestDates";
 
 const logger = debug("api:main");
@@ -36,6 +38,10 @@ async function main() {
 }
 
 async function startServer() {
+  await server.register(cors, {
+    origin: "*",
+  });
+
   server.register(fastifyNow, {
     routesFolder: path.join(__dirname, "./http/routes"),
   });
