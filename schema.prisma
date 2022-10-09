@@ -37,14 +37,25 @@ model Heartbeat {
 }
 
 model Incident {
-  id             Int      @id @default(autoincrement())
+  id             Int            @id @default(autoincrement())
   active         Boolean
   duration       Float?
   type           String
   title          String
   description    String?
+  monitor_name   String
+  monitor_url    String
   screenshot_url String?
-  monitor        Monitor  @relation(fields: [monitorId], references: [id])
+  monitor        Monitor        @relation(fields: [monitorId], references: [id])
   monitorId      Int
-  createdAt      DateTime @default(now())
+  createdAt      DateTime       @default(now())
+  slackIncident  SlackIncident?
+}
+
+model SlackIncident {
+  id         Int      @id @default(autoincrement())
+  ts         String
+  channel    String
+  incident   Incident @relation(fields: [incidentId], references: [id])
+  incidentId Int      @unique
 }

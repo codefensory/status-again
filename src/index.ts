@@ -18,19 +18,19 @@ async function main() {
 
   HeartbeatLoop.init();
 
-  const incidentsByBeatImpl = new IncidentsByBeatImpl();
-
-  await incidentsByBeatImpl.init();
-
-  MonitorsImpl.init();
-
   if (process.env.SLACK_TOKEN && process.env.SLACK_CHANNEL) {
     const api = new WebClient(process.env.SLACK_TOKEN);
 
     const slackIntegration = new SlackIntegration(api);
 
-    slackIntegration.init();
+    await slackIntegration.init();
   }
+
+  const incidentsByBeatImpl = new IncidentsByBeatImpl();
+
+  await incidentsByBeatImpl.init();
+
+  MonitorsImpl.init();
 
   startServer();
 }

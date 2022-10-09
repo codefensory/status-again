@@ -1,8 +1,9 @@
-import { Incident } from "@prisma/client";
-import { ChatPostMessageResponse, WebClient } from "@slack/web-api";
+import { Incident, SlackIncident } from "@prisma/client";
+import { WebClient } from "@slack/web-api";
 import { incidentEvent } from "../shared/events/incidentEvent";
 import debug from "debug";
 import { getBeatIncidentTemplate } from "./templates";
+import { prisma } from "../shared/database";
 
 const logger = debug("api:modules:slackIntegration:SlackIntegrationImpl");
 
@@ -10,13 +11,26 @@ export class SlackIntegration {
   private channelID: string = process.env.SLACK_CHANNEL ?? "";
 
   private incidentSend: {
-    [key: string]: Promise<ChatPostMessageResponse | undefined> | undefined;
+    [key: string]: Promise<SlackIncident | undefined> | undefined;
   } = {};
 
   constructor(private api: WebClient) {}
 
-  init() {
+  async init() {
     logger("SlackIntegration system started");
+
+    const incidentsActive = await prisma.incident.findMany({
+      where: { active: true },
+      select: { slackIncident: true },
+    });
+
+    for (let incidentActive of incidentsActive) {
+      if (incidentActive.slackIncident) {
+        this.incidentSend[incidentActive.slackIncident.incidentId] = Promise.resolve(
+          incidentActive.slackIncident
+        );
+      }
+    }
 
     incidentEvent.createIncidentSubject.subscribe((incident) => this.sendIncident(incident));
 
@@ -24,14 +38,22 @@ export class SlackIntegration {
   }
 
   async sendIncident(incident: Incident) {
-    const newIncidentPromise = new Promise<ChatPostMessageResponse | undefined>(async (resolve) => {
+    const newIncidentPromise = new Promise<SlackIncident | undefined>(async (resolve) => {
       const result = await this.api.chat.postMessage({
         ...getBeatIncidentTemplate(incident),
         channel: this.channelID,
       });
 
-      if (incident.active) {
-        return resolve(result);
+      if (incident.active && result.ts && result.channel) {
+        const slackIncident = await prisma.slackIncident.create({
+          data: {
+            ts: result.ts,
+            channel: result.channel,
+            incidentId: incident.id,
+          },
+        });
+
+        return resolve(slackIncident);
       }
 
       resolve(undefined);

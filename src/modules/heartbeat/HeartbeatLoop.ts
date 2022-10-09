@@ -18,11 +18,18 @@ export class HeartbeatLoop {
     heartbeatEvent.initializeNewBeatLoopSubject.subscribe((monitor) => new HeartbeatLoop(monitor));
   }
 
-  public previusBeat: Heartbeat | undefined;
+  public previusBeat: Heartbeat | undefined | null;
+
   public retries: number = 0;
 
   constructor(private monitor: Monitor) {
     logger(`[Monitor: "${this.monitor.name}"] New HeartbeatLoop created`);
+
+    this.start();
+  }
+
+  async start() {
+    this.previusBeat = await prisma.heartbeat.findFirst({ where: { monitorId: this.monitor.id } });
 
     this.loop();
   }
@@ -75,9 +82,18 @@ export class HeartbeatLoop {
       }
     }
 
-    const beatCreated = await prisma.heartbeat.create({ data: beat });
+    let beatCreated;
 
-    heartbeatEvent.hearbeatCreated(beatCreated, this.previusBeat);
+    if (this.previusBeat) {
+      beatCreated = await prisma.heartbeat.update({
+        where: { id: this.previusBeat.id },
+        data: beat,
+      });
+    } else {
+      beatCreated = await prisma.heartbeat.create({ data: beat });
+    }
+
+    heartbeatEvent.hearbeatCreated(beatCreated, this.previusBeat ?? undefined);
 
     this.previusBeat = beatCreated;
 

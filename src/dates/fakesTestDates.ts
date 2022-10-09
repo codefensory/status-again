@@ -7,7 +7,7 @@ const logger = debug("dates:fakeDates");
 
 const fakeMonitors: ToCreate<Monitor>[] = [
   {
-    name: "riqra",
+    name: "Storefront staging",
     type: "http",
     url: "https://staging.riqra.com/",
     headers: null,
@@ -20,17 +20,17 @@ const fakeMonitors: ToCreate<Monitor>[] = [
     accepted_statuscodes: "0-204,404",
   },
   //{
-    //name: "shopping cart",
-    //type: "http",
-    //url: "https://shopping-cart-apollo-production.up.railway.app/",
-    //headers: null,
-    //body: null,
-    //method: "GET",
-    //interval: 5000,
-    //retryInterval: 1000,
-    //maxretries: 3,
-    //active: true,
-    //accepted_statuscodes: "0-204,404",
+  //name: "shopping cart",
+  //type: "http",
+  //url: "https://shopping-cart-apollo-production.up.railway.app/",
+  //headers: null,
+  //body: null,
+  //method: "GET",
+  //interval: 5000,
+  //retryInterval: 1000,
+  //maxretries: 3,
+  //active: true,
+  //accepted_statuscodes: "0-204,404",
   //},
 ];
 
